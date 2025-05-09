@@ -15,7 +15,9 @@ const Layout: React.FC = () => {
       '/logistics': 'Logistique',
       '/accounting': 'Comptabilité',
       '/contacts': 'Contacts',
-      '/products': 'Produits'
+      '/products': 'Produits',
+      '/notion-settings': 'Configuration Notion',
+      '/n8n-integration': 'Intégration n8n'
     };
     
     return routes[pathname] || 'DIPN ERP';

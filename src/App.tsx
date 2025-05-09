@@ -9,6 +9,7 @@ import AccountingPage from './pages/AccountingPage';
 import ContactsPage from './pages/ContactsPage';
 import ProductsPage from './pages/ProductsPage';
 import NotionSettingsPage from './pages/NotionSettingsPage';
+import N8nIntegrationPage from './pages/N8nIntegrationPage';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
           <Route path="contacts" element={<ContactsPage />} />
           <Route path="products" element={<ProductsPage />} />
           <Route path="notion-settings" element={<NotionSettingsPage />} />
+          <Route path="n8n-integration" element={<N8nIntegrationPage />} />
         </Route>
       </Routes>
     </Router>

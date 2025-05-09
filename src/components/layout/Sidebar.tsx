@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Package, ClipboardList, Factory, Truck, FileDown as FileDollar, Users, BoxIcon, LayoutDashboard, ChevronRight, Menu, X, Database } from 'lucide-react';
+import { Package, ClipboardList, Factory, Truck, FileDown as FileDollar, Users, BoxIcon, LayoutDashboard, ChevronRight, Menu, X, Database, PlugZap } from 'lucide-react';
 
 interface SidebarItemProps {
   to: string;
@@ -161,6 +161,14 @@ const Sidebar: React.FC = () => {
                 icon={<Database size={20} />}
                 label="Config. Notion"
                 active={isActive('/notion-settings')}
+                collapsed={collapsed}
+                onClick={closeMobileMenu}
+              />
+              <SidebarItem
+                to="/n8n-integration"
+                icon={<PlugZap size={20} />}
+                label="Intégration n8n"
+                active={isActive('/n8n-integration')}
                 collapsed={collapsed}
                 onClick={closeMobileMenu}
               />

@@ -24,8 +24,8 @@ const getNotionClient = (): Client => {
 // Test the connection to Notion API
 export const testConnection = async (): Promise<{ isConnected: boolean; error?: string }> => {
   try {
-    // Test the connection to our server's Notion status endpoint
-    const response = await fetch('http://localhost:3001/api/notion/status', {
+    // Use the relative path to leverage Vite's proxy configuration
+    const response = await fetch('/api/notion/status', {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' }
     });

@@ -25,7 +25,8 @@ const getNotionClient = (): Client => {
 export const testConnection = async (): Promise<{ isConnected: boolean; error?: string }> => {
   try {
     // Using the worker proxy to avoid CORS issues
-    const response = await fetch('/validate', {
+    // Remove the leading slash to match the worker's path handling
+    const response = await fetch('validate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 

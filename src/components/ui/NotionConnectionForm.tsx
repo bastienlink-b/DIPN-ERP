@@ -21,7 +21,7 @@ const NotionConnectionForm: React.FC<NotionConnectionFormProps> = ({ onConnect }
   // Load the API key on component mount
   useEffect(() => {
     // La clé est déjà configurée dans l'environnement ou par défaut dans le service
-    setApiKey('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');
+    setApiKey('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');
     setSaveSuccess(true);
   }, []);
 

@@ -24,7 +24,7 @@ const getNotionClient = (): Client => {
   if (!notionClient) {
     // Use a hardcoded API key if the environment variable is not available
     // This is a workaround for development; in production, use environment variables
-    const apiKey = import.meta.env.VITE_NOTION_API_KEY || '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';
+    const apiKey = import.meta.env.VITE_NOTION_API_KEY || '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';
     
     if (!apiKey) {
       throw new Error('Notion API key is not defined');

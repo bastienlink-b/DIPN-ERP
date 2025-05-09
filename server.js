@@ -19,7 +19,7 @@ app.use(express.json());
 
 // Notion API configuration
 const NOTION_API_URL = 'https://api.notion.com/v1';
-const NOTION_API_KEY = process.env.NOTION_API_KEY || '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';
+const NOTION_API_KEY = process.env.NOTION_API_KEY || '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';
 const NOTION_API_VERSION = '2022-06-28';
 
 // Root route for health check

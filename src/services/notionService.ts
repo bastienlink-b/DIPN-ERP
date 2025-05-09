@@ -24,13 +24,10 @@ const getNotionClient = (): Client => {
 // Test the connection to Notion API
 export const testConnection = async (): Promise<{ isConnected: boolean; error?: string }> => {
   try {
-    // Use the server endpoint instead of the worker
-    const response = await fetch('http://localhost:3001/api/notion/validate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        apiKey: import.meta.env.VITE_NOTION_API_KEY || ''
-      })
+    // Test the connection to our server's Notion status endpoint
+    const response = await fetch('http://localhost:3001/api/notion/status', {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
     });
     
     // Check if the response is OK before trying to parse JSON
@@ -42,8 +39,8 @@ export const testConnection = async (): Promise<{ isConnected: boolean; error?: 
     
     const data = await response.json();
     
-    if (!data.valid) {
-      throw new Error(data.error || 'Failed to connect to Notion API');
+    if (data.status !== 'connected') {
+      throw new Error(data.message || 'Failed to connect to Notion API');
     }
     
     return { isConnected: true };

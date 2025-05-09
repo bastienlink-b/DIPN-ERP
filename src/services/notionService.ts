@@ -24,24 +24,9 @@ const getNotionClient = (): Client => {
 // Test the connection to Notion API
 export const testConnection = async (): Promise<{ isConnected: boolean; error?: string }> => {
   try {
-    // Use the relative path to leverage Vite's proxy configuration
-    const response = await fetch('/api/notion/status', {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' }
-    });
-    
-    // Check if the response is OK before trying to parse JSON
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Error response from server:', errorText);
-      throw new Error(`Server responded with status ${response.status}: ${errorText || 'No response body'}`);
-    }
-    
-    const data = await response.json();
-    
-    if (data.status !== 'connected') {
-      throw new Error(data.message || 'Failed to connect to Notion API');
-    }
+    const client = getNotionClient();
+    // Test the connection by listing users
+    const response = await client.users.list({});
     
     return { isConnected: true };
   } catch (error) {

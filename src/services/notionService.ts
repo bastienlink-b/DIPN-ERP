@@ -1,4 +1,5 @@
 import { Client } from '@notionhq/client';
+import axios from 'axios';
 
 // Database IDs
 const DATABASES = {
@@ -11,6 +12,9 @@ const DATABASES = {
 
 // API version
 const NOTION_API_VERSION = '2022-06-28';
+
+// Proxy API base URL - connects to our Express server
+const API_BASE_URL = 'http://localhost:3001/api/notion';
 
 // Singleton instance of Notion client
 let notionClient: Client | null = null;
@@ -39,11 +43,10 @@ const getNotionClient = (): Client => {
 // Test the connection to Notion API
 export const testConnection = async (): Promise<{ isConnected: boolean; error?: string }> => {
   try {
-    const client = getNotionClient();
-    // Test the connection by listing users
-    const response = await client.users.list({});
+    // Use the proxy server instead of calling Notion API directly
+    const response = await axios.get(`${API_BASE_URL}/test`);
     
-    return { isConnected: true };
+    return { isConnected: response.data.isConnected };
   } catch (error) {
     console.error('Error connecting to Notion API:', error);
     return { 
@@ -60,14 +63,12 @@ export const testDatabaseConnection = async (databaseId: string): Promise<{
   name?: string;
 }> => {
   try {
-    const client = getNotionClient();
-    const response = await client.databases.retrieve({
-      database_id: databaseId
-    });
+    // Use the proxy server for database connection test
+    const response = await axios.get(`${API_BASE_URL}/database/${databaseId}`);
     
     return { 
-      isConnected: true,
-      name: response.title?.[0]?.plain_text || 'Database'
+      isConnected: response.data.isConnected,
+      name: response.data.name
     };
   } catch (error) {
     console.error(`Error connecting to database ${databaseId}:`, error);
@@ -85,14 +86,13 @@ export const queryDatabase = async (
   sorts?: any[]
 ) => {
   try {
-    const client = getNotionClient();
-    const response = await client.databases.query({
-      database_id: databaseId,
+    // Use the proxy server for querying the database
+    const response = await axios.post(`${API_BASE_URL}/database/${databaseId}/query`, {
       filter,
       sorts
     });
     
-    return { success: true, data: response };
+    return { success: true, data: response.data.data };
   } catch (error) {
     console.error('Error querying database:', error);
     return { 
@@ -105,12 +105,10 @@ export const queryDatabase = async (
 // Get database details
 export const getDatabase = async (databaseId: string) => {
   try {
-    const client = getNotionClient();
-    const response = await client.databases.retrieve({
-      database_id: databaseId
-    });
+    // Use the proxy server to get database details
+    const response = await axios.get(`${API_BASE_URL}/database/${databaseId}`);
     
-    return { success: true, data: response };
+    return { success: true, data: response.data.data };
   } catch (error) {
     console.error('Error retrieving database:', error);
     return { 
@@ -127,10 +125,10 @@ export const createPage = async (data: {
   children?: any[];
 }) => {
   try {
-    const client = getNotionClient();
-    const response = await client.pages.create(data);
+    // Use the proxy server to create a page
+    const response = await axios.post(`${API_BASE_URL}/pages`, data);
     
-    return { success: true, data: response };
+    return { success: true, data: response.data.data };
   } catch (error) {
     console.error('Error creating page:', error);
     return { 
@@ -143,13 +141,10 @@ export const createPage = async (data: {
 // Update a page
 export const updatePage = async (pageId: string, properties: any) => {
   try {
-    const client = getNotionClient();
-    const response = await client.pages.update({
-      page_id: pageId,
-      properties
-    });
+    // Use the proxy server to update a page
+    const response = await axios.patch(`${API_BASE_URL}/pages/${pageId}`, { properties });
     
-    return { success: true, data: response };
+    return { success: true, data: response.data.data };
   } catch (error) {
     console.error('Error updating page:', error);
     return { 
@@ -162,13 +157,10 @@ export const updatePage = async (pageId: string, properties: any) => {
 // Delete a page (archive it)
 export const archivePage = async (pageId: string) => {
   try {
-    const client = getNotionClient();
-    const response = await client.pages.update({
-      page_id: pageId,
-      archived: true
-    });
+    // Use the proxy server to archive a page
+    const response = await axios.patch(`${API_BASE_URL}/pages/${pageId}/archive`, {});
     
-    return { success: true, data: response };
+    return { success: true, data: response.data.data };
   } catch (error) {
     console.error('Error archiving page:', error);
     return { 

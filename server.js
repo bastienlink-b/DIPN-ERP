@@ -22,9 +22,10 @@ const NOTION_API_URL = 'https://api.notion.com/v1';
 const NOTION_API_KEY = process.env.NOTION_API_KEY || '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';
 const NOTION_API_VERSION = '2022-06-28';
 
-// Root route for health check
+// Root route for health check with redirect to React app
 app.get('/', (req, res) => {
-  res.send('Notion API Proxy Server is running');
+  // Redirect users to the React app instead of showing the text message
+  res.redirect('http://localhost:5173');
 });
 
 // Log requests

@@ -75,6 +75,38 @@ app.get('/api/notion/status', async (req, res) => {
   }
 });
 
+// NEW ENDPOINT: Route to validate API key
+app.post('/api/notion/validate', async (req, res) => {
+  try {
+    const { apiKey } = req.body;
+    
+    if (!apiKey) {
+      return res.status(400).json({ 
+        valid: false,
+        error: 'API key is required' 
+      });
+    }
+    
+    // Create a temporary Notion client with the provided API key
+    const tempClient = new Client({ auth: apiKey });
+    
+    // Try to list users to verify the API key is valid
+    const response = await tempClient.users.list({});
+    
+    res.json({ 
+      valid: true,
+      message: 'API key is valid'
+    });
+    
+  } catch (error) {
+    console.error('Error validating API key:', error);
+    res.status(400).json({ 
+      valid: false,
+      error: error.message || 'Failed to validate Notion API key'
+    });
+  }
+});
+
 // Route to query a database
 app.post('/api/notion/database/:databaseId/query', checkNotionApiKey, async (req, res) => {
   try {

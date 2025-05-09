@@ -11,4 +11,13 @@ export default defineConfig({
   define: {
     'import.meta.env.VITE_NOTION_API_KEY': JSON.stringify(process.env.VITE_NOTION_API_KEY)
   },
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+        secure: false,
+      }
+    }
+  }
 });

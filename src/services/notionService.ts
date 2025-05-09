@@ -8,7 +8,7 @@ const getNotionClient = (): Client => {
   if (!notionClient) {
     // Use the API key directly from the environment when in development
     // In production, you might want to handle this differently for security
-    const apiKey = import.meta.env.VITE_NOTION_API_KEY || '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';
+    const apiKey = import.meta.env.VITE_NOTION_API_KEY || '';
     
     if (!apiKey) {
       throw new Error('Notion API key is not defined');
@@ -24,13 +24,12 @@ const getNotionClient = (): Client => {
 // Test the connection to Notion API
 export const testConnection = async (): Promise<{ isConnected: boolean; error?: string }> => {
   try {
-    // Using the worker proxy to avoid CORS issues
-    // Ensure proper URL construction with leading slash for worker routing
-    const response = await fetch('/validate', {
+    // Use the server endpoint instead of the worker
+    const response = await fetch('http://localhost:3001/api/notion/validate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
-        apiKey: import.meta.env.VITE_NOTION_API_KEY || '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' 
+        apiKey: import.meta.env.VITE_NOTION_API_KEY || ''
       })
     });
     
@@ -41,14 +40,7 @@ export const testConnection = async (): Promise<{ isConnected: boolean; error?: 
       throw new Error(`Server responded with status ${response.status}: ${errorText || 'No response body'}`);
     }
     
-    // Check if response contains content before parsing
-    const responseText = await response.text();
-    if (!responseText.trim()) {
-      throw new Error('Empty response from server');
-    }
-    
-    // Parse the JSON from the text response
-    const data = JSON.parse(responseText);
+    const data = await response.json();
     
     if (!data.valid) {
       throw new Error(data.error || 'Failed to connect to Notion API');

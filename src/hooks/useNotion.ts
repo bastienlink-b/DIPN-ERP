@@ -54,63 +54,6 @@ export const useNotionConnection = () => {
   return status;
 };
 
-export const useNotionDatabase = (databaseId: string) => {
-  const [database, setDatabase] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchDatabase = async () => {
-      if (!databaseId) {
-        setIsLoading(false);
-        return;
-      }
-
-      try {
-        const response = await notionService.getDatabase(databaseId);
-        
-        if (response.success) {
-          setDatabase(response.data);
-          setError(null);
-        } else {
-          setError(response.error || 'Failed to fetch database');
-        }
-      } catch (error) {
-        setError(error instanceof Error ? error.message : 'Unknown error occurred');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchDatabase();
-  }, [databaseId]);
-
-  const queryDatabaseData = async (options: { filter?: any; sorts?: any[] } = {}) => {
-    if (!databaseId) return null;
-    
-    setIsLoading(true);
-    
-    try {
-      const response = await notionService.queryDatabase(databaseId, options.filter, options.sorts);
-      
-      if (response.success) {
-        setError(null);
-        return response.data;
-      } else {
-        setError(response.error || 'Failed to query database');
-        return null;
-      }
-    } catch (error) {
-      setError(error instanceof Error ? error.message : 'Unknown error occurred');
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  return { database, isLoading, error, queryDatabase: queryDatabaseData };
-};
-
 export const useNotionDatabaseConnection = (databaseId: string) => {
   const [status, setStatus] = useState<{
     isConnected: boolean;
@@ -173,6 +116,63 @@ export const useNotionDatabaseConnection = (databaseId: string) => {
   }, [databaseId]);
 
   return status;
+};
+
+export const useNotionDatabase = (databaseId: string) => {
+  const [database, setDatabase] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchDatabase = async () => {
+      if (!databaseId) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const response = await notionService.getDatabase(databaseId);
+        
+        if (response.success) {
+          setDatabase(response.data);
+          setError(null);
+        } else {
+          setError(response.error || 'Failed to fetch database');
+        }
+      } catch (error) {
+        setError(error instanceof Error ? error.message : 'Unknown error occurred');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchDatabase();
+  }, [databaseId]);
+
+  const queryDatabaseData = async (options: { filter?: any; sorts?: any[] } = {}) => {
+    if (!databaseId) return null;
+    
+    setIsLoading(true);
+    
+    try {
+      const response = await notionService.queryDatabase(databaseId, options.filter, options.sorts);
+      
+      if (response.success) {
+        setError(null);
+        return response.data;
+      } else {
+        setError(response.error || 'Failed to query database');
+        return null;
+      }
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Unknown error occurred');
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return { database, isLoading, error, queryDatabase: queryDatabaseData };
 };
 
 export const useNotionPage = () => {

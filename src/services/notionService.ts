@@ -14,7 +14,7 @@ const DATABASES = {
 const NOTION_API_VERSION = '2022-06-28';
 
 // Proxy API base URL - connects to our Express server
-const API_BASE_URL = 'http://localhost:3001/api/notion';
+const API_BASE_URL = '/api/notion';
 
 // Singleton instance of Notion client
 let notionClient: Client | null = null;

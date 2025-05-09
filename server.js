@@ -18,6 +18,11 @@ const NOTION_API_URL = 'https://api.notion.com/v1';
 const NOTION_API_KEY = process.env.NOTION_API_KEY || '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';
 const NOTION_API_VERSION = '2022-06-28';
 
+// Root route for health check
+app.get('/', (req, res) => {
+  res.send('Notion API Proxy Server is running');
+});
+
 // Log requests
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);

@@ -9,8 +9,12 @@ config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// CORS middleware
-app.use(cors());
+// CORS middleware - Important: Allow requests from the Vite dev server
+app.use(cors({
+  origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
+  methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+  credentials: true
+}));
 app.use(express.json());
 
 // Notion API configuration
@@ -194,4 +198,5 @@ app.patch('/api/notion/pages/:id/archive', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Notion API proxy available at http://localhost:${PORT}/api/notion`);
+  console.log(`❗ IMPORTANT: Access your React app at http://localhost:5173, NOT port ${PORT}`);
 });

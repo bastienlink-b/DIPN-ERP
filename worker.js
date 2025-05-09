@@ -13,11 +13,11 @@ export default {
 
     try {
       // Router les requêtes vers les gestionnaires appropriés
-      if (path === "validate") {
+      if (path === "validate" || path === "validate/") {
         return await handleValidate(request);
-      } else if (path === "sync") {
+      } else if (path === "sync" || path === "sync/") {
         return await handleSync(request);
-      } else if (path === "fetch") {
+      } else if (path === "fetch" || path === "fetch/") {
         return await handleFetch(request);
       } else {
         return new Response(JSON.stringify({ error: "Endpoint non trouvé", path: path }), {

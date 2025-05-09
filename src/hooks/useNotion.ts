@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { testConnection, queryDatabase, getDatabase, createPage, updatePage } from '../services/notionService';
+import { useState, useEffect, useCallback } from 'react';
+import * as notionService from '../services/notionService';
 
 export const useNotionConnection = () => {
   const [status, setStatus] = useState<{
@@ -17,7 +17,7 @@ export const useNotionConnection = () => {
       try {
         console.log("Checking Notion connection...");
         
-        const result = await testConnection();
+        const result = await notionService.testConnection();
         
         if (result.isConnected) {
           setStatus({
@@ -67,7 +67,7 @@ export const useNotionDatabase = (databaseId: string) => {
       }
 
       try {
-        const response = await getDatabase(databaseId);
+        const response = await notionService.getDatabase(databaseId);
         
         if (response.success) {
           setDatabase(response.data);
@@ -91,7 +91,7 @@ export const useNotionDatabase = (databaseId: string) => {
     setIsLoading(true);
     
     try {
-      const response = await queryDatabase(databaseId, options.filter, options.sorts);
+      const response = await notionService.queryDatabase(databaseId, options.filter, options.sorts);
       
       if (response.success) {
         setError(null);
@@ -111,6 +111,70 @@ export const useNotionDatabase = (databaseId: string) => {
   return { database, isLoading, error, queryDatabase: queryDatabaseData };
 };
 
+export const useNotionDatabaseConnection = (databaseId: string) => {
+  const [status, setStatus] = useState<{
+    isConnected: boolean;
+    isLoading: boolean;
+    error: string | null;
+    name: string | null;
+  }>({
+    isConnected: false,
+    isLoading: true,
+    error: null,
+    name: null
+  });
+
+  useEffect(() => {
+    const checkConnection = async () => {
+      if (!databaseId) {
+        setStatus({
+          isConnected: false,
+          isLoading: false,
+          error: 'No database ID provided',
+          name: null
+        });
+        return;
+      }
+
+      try {
+        const result = await notionService.testDatabaseConnection(databaseId);
+        
+        if (result.isConnected) {
+          setStatus({
+            isConnected: true,
+            isLoading: false,
+            error: null,
+            name: result.name || null
+          });
+        } else {
+          setStatus({
+            isConnected: false,
+            isLoading: false,
+            error: result.error || 'Failed to connect to database',
+            name: null
+          });
+        }
+      } catch (error) {
+        let errorMessage = 'Unknown error occurred';
+        if (error instanceof Error) {
+          errorMessage = error.message;
+        }
+        
+        setStatus({
+          isConnected: false,
+          isLoading: false,
+          error: errorMessage,
+          name: null
+        });
+      }
+    };
+
+    checkConnection();
+  }, [databaseId]);
+
+  return status;
+};
+
 export const useNotionPage = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -123,7 +187,7 @@ export const useNotionPage = () => {
     setIsLoading(true);
     
     try {
-      const response = await createPage(data);
+      const response = await notionService.createPage(data);
       
       if (response.success) {
         setError(null);
@@ -144,7 +208,7 @@ export const useNotionPage = () => {
     setIsLoading(true);
     
     try {
-      const response = await updatePage(pageId, properties);
+      const response = await notionService.updatePage(pageId, properties);
       
       if (response.success) {
         setError(null);
@@ -161,5 +225,76 @@ export const useNotionPage = () => {
     }
   };
 
-  return { createPage: createNotionPage, updatePage: updateNotionPage, isLoading, error };
+  const archiveNotionPage = async (pageId: string) => {
+    setIsLoading(true);
+    
+    try {
+      const response = await notionService.archivePage(pageId);
+      
+      if (response.success) {
+        setError(null);
+        return response.data;
+      } else {
+        setError(response.error || 'Failed to archive page');
+        return null;
+      }
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Unknown error occurred');
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return { 
+    createPage: createNotionPage, 
+    updatePage: updateNotionPage, 
+    archivePage: archiveNotionPage,
+    isLoading, 
+    error 
+  };
+};
+
+export const useNotionConfig = () => {
+  const [isUpdating, setIsUpdating] = useState(false);
+  
+  // Get database IDs
+  const getDatabaseIds = useCallback(() => {
+    return notionService.getDatabaseIds();
+  }, []);
+
+  // Update a database ID
+  const updateDatabaseId = useCallback(async (key: string, newId: string) => {
+    setIsUpdating(true);
+    try {
+      // First test if the database is accessible
+      const result = await notionService.testDatabaseConnection(newId);
+      
+      if (result.isConnected) {
+        // Update the database ID
+        const updated = notionService.updateDatabaseId(key as any, newId);
+        return { 
+          success: updated, 
+          name: result.name, 
+          error: updated ? null : 'Failed to update database ID' 
+        };
+      } else {
+        return { 
+          success: false, 
+          name: null, 
+          error: result.error || 'Cannot connect to the specified database' 
+        };
+      }
+    } catch (error) {
+      return { 
+        success: false, 
+        name: null,
+        error: error instanceof Error ? error.message : 'Unknown error occurred' 
+      };
+    } finally {
+      setIsUpdating(false);
+    }
+  }, []);
+
+  return { getDatabaseIds, updateDatabaseId, isUpdating };
 };
